@@ -224,6 +224,10 @@ if( PTSCOTCH_FOUND AND NOT PTSCOTCH::ptscotch )
 
 
   # Alias SCOTCH linkage 
-  add_library( PTSCOTCH::scotch ALIAS SCOTCH::scotch )
+  add_library( PTSCOTCH::scotch INTERFACE IMPORTED )
+  set_target_properties( PTSCOTCH::scotch PROPERTIES
+    INTERFACE_LINK_LIBRARIES SCOTCH::scotch 
+  )
+    
 
 endif()

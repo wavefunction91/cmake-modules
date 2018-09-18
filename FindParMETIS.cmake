@@ -208,6 +208,9 @@ if( PARMETIS_FOUND AND NOT ParMETIS::parmetis )
   )
 
   # Alias METIS linkage 
-  add_library( ParMETIS::metis ALIAS METIS::metis )
+  add_library( ParMETIS::metis INTERFACE IMPORTED )
+  set_target_properties( ParMETIS::metis PROPERTIES
+    INTERFACE_LINK_LIBRARIES METIS::metis 
+  )
 
 endif()
