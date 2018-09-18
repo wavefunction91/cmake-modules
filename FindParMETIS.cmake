@@ -207,4 +207,7 @@ if( PARMETIS_FOUND AND NOT ParMETIS::parmetis )
     INTERFACE_LINK_LIBRARIES      "${PARMETIS_LIBRARIES};METIS::metis" 
   )
 
+  # Alias METIS linkage 
+  add_library( ParMETIS::metis ALIAS METIS::metis )
+
 endif()

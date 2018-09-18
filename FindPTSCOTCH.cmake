@@ -219,7 +219,11 @@ if( PTSCOTCH_FOUND AND NOT PTSCOTCH::ptscotch )
   add_library( PTSCOTCH::ptscotch INTERFACE IMPORTED )
   set_target_properties( PTSCOTCH::ptscotch PROPERTIES
     INTERFACE_INCLUDE_DIRECTORIES "${PTSCOTCH_INCLUDE_DIR}"
-    INTERFACE_LINK_LIBRARIES      "${PTSCOTCH_LIBRARIES}" 
+    INTERFACE_LINK_LIBRARIES      "${PTSCOTCH_LIBRARIES};SCOTCH::scotch" 
   )
+
+
+  # Alias SCOTCH linkage 
+  add_library( PTSCOTCH::scotch ALIAS SCOTCH::scotch )
 
 endif()
