@@ -8,6 +8,24 @@
 #     PARMETIS_INCLUDE_DIR  - Location of ParMETIS headers
 #     PARMETIS_LIBRARIES    - ParMETIS libraries
 #     PARMETIS_USES_ILP64   - Whether ParMETIS was compiled with ILP64
+#   This module will export the following targets if PARMETIS_FOUND
+#
+#     ParMETIS::parmetis
+#
+#
+#
+#
+#   Proper usage:
+#
+#     project( TEST_FIND_PARMETIS C )
+#     find_package( ParMETIS )
+#
+#     if( PARMETIS_FOUND )
+#       add_executable( test test.cxx )
+#       target_link_libraries( test ParMETIS::parmetis )
+#     endif()
+#
+#
 #
 #
 #   This module will use the following variables to change

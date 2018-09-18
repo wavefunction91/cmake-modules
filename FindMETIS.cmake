@@ -7,7 +7,26 @@
 #     METIS_FOUND        - System has found METIS installation
 #     METIS_INCLUDE_DIR  - Location of METIS headers
 #     METIS_LIBRARIES    - METIS libraries
-#     METIS_USES_ILP64   - Whether METIS was compiled with ILP64
+#     METIS_USES_ILP64   - Whether METIS was configured with ILP64
+#
+#   This module will export the following targets if METIS_FOUND
+#
+#     METIS::metis
+#
+#
+#
+#
+#   Proper usage:
+#
+#     project( TEST_FIND_METIS C )
+#     find_package( METIS )
+#
+#     if( METIS_FOUND )
+#       add_executable( test test.cxx )
+#       target_link_libraries( test METIS::metis )
+#     endif()
+#
+#
 #
 #
 #   This module will use the following variables to change
