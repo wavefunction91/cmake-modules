@@ -9,6 +9,10 @@
 #     METIS_LIBRARIES    - METIS libraries
 #     METIS_USES_ILP64   - Whether METIS was configured with ILP64
 #
+#   This module can handle the following COMPONENTS
+#
+#     ilp64 - 64-bit index integers
+#
 #   This module will export the following targets if METIS_FOUND
 #
 #     METIS::metis
@@ -177,6 +181,12 @@ if( EXISTS ${METIS_INCLUDE_DIR}/metis.h )
 endif()
 
 
+
+# Handle components
+if( METIS_USES_ILP64 )
+  set( METIS_ilp64_FOUND TRUE )
+endif()
+
 # Determine if we've found METIS
 mark_as_advanced( METIS_FOUND METIS_INCLUDE_DIR METIS_LIBRARIES )
 
@@ -184,9 +194,8 @@ include(FindPackageHandleStandardArgs)
 find_package_handle_standard_args( METIS
   REQUIRED_VARS METIS_LIBRARIES METIS_INCLUDE_DIR
   VERSION_VAR METIS_VERSION_STRING
+  HANDLE_COMPONENTS
 )
-
-
 
 # Export target
 if( METIS_FOUND AND NOT METIS::metis )

@@ -8,6 +8,11 @@
 #     PARMETIS_INCLUDE_DIR  - Location of ParMETIS headers
 #     PARMETIS_LIBRARIES    - ParMETIS libraries
 #     PARMETIS_USES_ILP64   - Whether ParMETIS was compiled with ILP64
+
+#   This module can handle the following COMPONENTS
+#
+#     ilp64 - 64-bit index integers
+#
 #   This module will export the following targets if PARMETIS_FOUND
 #
 #     ParMETIS::parmetis
@@ -175,6 +180,10 @@ if( METIS_FOUND )
 
 endif()
 
+# Handle components
+if( PARMETIS_USES_ILP64 )
+  set( PARMETIS_ilp64_FOUND TRUE )
+endif()
 
 
 
@@ -186,6 +195,7 @@ include(FindPackageHandleStandardArgs)
 find_package_handle_standard_args( PARMETIS
   REQUIRED_VARS PARMETIS_LIBRARIES PARMETIS_INCLUDE_DIR METIS_FOUND 
   VERSION_VAR PARMETIS_VERSION_STRING
+  HANDLE_COMPONENTS
 )
 
 # Export target
