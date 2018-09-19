@@ -113,8 +113,22 @@ fill_out_prefix( superlu_dist )
 
 
 # Dependencies
-if( NOT TARGET LinAlg::BLAS )
+if( NOT TARGET SuperLU::BLAS )
+
   find_package( LinAlg QUIET )
+
+  add_library( SuperLU::BLAS INTERFACE IMPORTED )
+  target_link_libraries( SuperLU::BLAS INTERFACE LinAlg::BLAS )
+
+endif()
+
+if( NOT TARGET SuperLU::parmetis )
+
+  find_package( ParMETIS QUIET )
+
+  add_library( SuperLU::parmetis INTERFACE IMPORTED )
+  target_link_libraries( SuperLU::parmetis INTERFACE ParMETIS::parmetis )
+
 endif()
 
 
@@ -191,7 +205,7 @@ if( SUPERLU_DIST_FOUND AND NOT TARGET SuperLU::superlu_dist )
   add_library( SuperLU::superlu_dist INTERFACE IMPORTED )
   set_target_properties( SuperLU::superlu_dist PROPERTIES
     INTERFACE_INCLUDE_DIRECTORIES "${SUPERLU_DIST_INCLUDE_DIR}"
-    INTERFACE_LINK_LIBRARIES      "${SUPERLU_DIST_LIBRARIES};LinAlg::BLAS" 
+    INTERFACE_LINK_LIBRARIES      "${SUPERLU_DIST_LIBRARIES};SuperLU::parmetis;SuperLU::BLAS" 
   )
 
 endif()
