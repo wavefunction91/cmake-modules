@@ -262,7 +262,7 @@ find_package_handle_standard_args( SCOTCH
 )
 
 # Export target
-if( SCOTCH_FOUND AND NOT SCOTCH::scotch )
+if( SCOTCH_FOUND AND NOT TARGET SCOTCH::scotch )
 
   add_library( SCOTCH::scotch INTERFACE IMPORTED )
   set_target_properties( SCOTCH::scotch PROPERTIES

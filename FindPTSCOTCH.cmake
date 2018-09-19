@@ -214,7 +214,7 @@ find_package_handle_standard_args( PTSCOTCH
 )
 
 # Export target
-if( PTSCOTCH_FOUND AND NOT PTSCOTCH::ptscotch )
+if( PTSCOTCH_FOUND AND NOT TARGET PTSCOTCH::ptscotch )
 
   add_library( PTSCOTCH::ptscotch INTERFACE IMPORTED )
   set_target_properties( PTSCOTCH::ptscotch PROPERTIES

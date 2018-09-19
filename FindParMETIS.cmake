@@ -199,7 +199,7 @@ find_package_handle_standard_args( PARMETIS
 )
 
 # Export target
-if( PARMETIS_FOUND AND NOT ParMETIS::parmetis )
+if( PARMETIS_FOUND AND NOT TARGET ParMETIS::parmetis )
 
   add_library( ParMETIS::parmetis INTERFACE IMPORTED )
   set_target_properties( ParMETIS::parmetis PROPERTIES

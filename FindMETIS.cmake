@@ -198,7 +198,7 @@ find_package_handle_standard_args( METIS
 )
 
 # Export target
-if( METIS_FOUND AND NOT METIS::metis )
+if( METIS_FOUND AND NOT TARGET METIS::metis )
 
   add_library( METIS::metis INTERFACE IMPORTED )
   set_target_properties( METIS::metis PROPERTIES
