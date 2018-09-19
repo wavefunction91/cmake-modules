@@ -113,9 +113,26 @@ if( parmetis_LIBRARY_DIR AND NOT metis_LIBRARY_DIR )
   set( metis_LIBRARY_DIR ${parmetis_LIBRARY_DIR} )
 endif()
 
-# Try to Find METIS installation
-find_package( METIS )
 
+# Try to Find METIS installation
+if( NOT TARGET METIS::metis )
+  find_package( METIS )
+endif()
+
+
+# MPI
+if( NOT TARGET ParMETIS::mpi )
+
+  find_package( MPI )
+
+  add_library( ParMETIS::mpi INTERFACE IMPORTED )
+  set_target_properties( ParMETIS::mpi PROPERTIES
+    INTERFACE_INCLUDE_DIRECTORIES "${MPI_C_INCLUDE_PATH}"
+    INTERFACE_LINK_LIBRARIES      "${MPI_C_LIBRARIES}"
+    INTERFACE_COMPILE_OPTIONS     "${MPI_C_FLAGS}"
+  )
+
+endif()
 
 # Try to find the header
 find_path( PARMETIS_INCLUDE_DIR 
@@ -204,7 +221,7 @@ if( PARMETIS_FOUND AND NOT TARGET ParMETIS::parmetis )
   add_library( ParMETIS::parmetis INTERFACE IMPORTED )
   set_target_properties( ParMETIS::parmetis PROPERTIES
     INTERFACE_INCLUDE_DIRECTORIES "${PARMETIS_INCLUDE_DIR}"
-    INTERFACE_LINK_LIBRARIES      "${PARMETIS_LIBRARIES};METIS::metis" 
+    INTERFACE_LINK_LIBRARIES      "${PARMETIS_LIBRARIES};METIS::metis;ParMETIS::mpi" 
   )
 
   # Alias METIS linkage 
