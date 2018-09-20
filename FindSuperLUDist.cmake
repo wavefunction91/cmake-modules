@@ -120,7 +120,7 @@ endif()
 
 # Inherits MPI from ParMETIS
 if( NOT TARGET ParMETIS::parmetis )
-  find_dependency( ParMETIS REQUIRED )
+  find_package( ParMETIS REQUIRED )
 endif()
 
 
