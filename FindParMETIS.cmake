@@ -85,6 +85,12 @@
 #
 #==================================================================
 
+cmake_minimum_required( VERSION 3.11 ) # Require CMake 3.11+
+
+include(CMakeFindDependencyMacro)
+
+
+
 # Set up some auxillary vars if hints have been set
 
 if( parmetis_PREFIX AND NOT parmetis_INCLUDE_DIR )
@@ -114,25 +120,35 @@ if( parmetis_LIBRARY_DIR AND NOT metis_LIBRARY_DIR )
 endif()
 
 
-# Try to Find METIS installation
+
+
+
+# DEPENDENCIES
+
+# Make sure C is enabled
+get_property( ParMETIS_languages GLOBAL PROPERTY ENABLED_LANGUAGES )
+if( NOT "C" IN_LIST ParMETIS_languages )
+  message( FATAL_ERROR "C Language Must Be Enabled for ParMETIS Linkage" )
+endif()
+
+
+# METIS
 if( NOT TARGET METIS::metis )
-  find_package( METIS )
+  find_dependency( METIS REQUIRED )
 endif()
 
 
 # MPI
-if( NOT TARGET ParMETIS::mpi )
-
-  find_package( MPI )
-
-  add_library( ParMETIS::mpi INTERFACE IMPORTED )
-  set_target_properties( ParMETIS::mpi PROPERTIES
-    INTERFACE_INCLUDE_DIRECTORIES "${MPI_C_INCLUDE_PATH}"
-    INTERFACE_LINK_LIBRARIES      "${MPI_C_LIBRARIES}"
-    INTERFACE_COMPILE_OPTIONS     "${MPI_C_FLAGS}"
-  )
-
+if( NOT TARGET MPI::MPI_C )
+  find_dependency( MPI REQUIRED )
 endif()
+
+
+
+
+
+
+
 
 # Try to find the header
 find_path( PARMETIS_INCLUDE_DIR 
@@ -221,13 +237,7 @@ if( PARMETIS_FOUND AND NOT TARGET ParMETIS::parmetis )
   add_library( ParMETIS::parmetis INTERFACE IMPORTED )
   set_target_properties( ParMETIS::parmetis PROPERTIES
     INTERFACE_INCLUDE_DIRECTORIES "${PARMETIS_INCLUDE_DIR}"
-    INTERFACE_LINK_LIBRARIES      "${PARMETIS_LIBRARIES};METIS::metis;ParMETIS::mpi" 
-  )
-
-  # Alias METIS linkage 
-  add_library( ParMETIS::metis INTERFACE IMPORTED )
-  set_target_properties( ParMETIS::metis PROPERTIES
-    INTERFACE_LINK_LIBRARIES METIS::metis 
+    INTERFACE_LINK_LIBRARIES      "${PARMETIS_LIBRARIES};METIS::metis;MPI::MPI_C" 
   )
 
 endif()

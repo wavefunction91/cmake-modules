@@ -113,12 +113,10 @@ fill_out_prefix( superlu )
 
 
 # Dependencies
-if( NOT TARGET SuperLU::BLAS )
+if( NOT TARGET LinAlg::BLAS )
 
-  find_package( LinAlg QUIET )
-
-  add_library( SuperLU::BLAS INTERFACE IMPORTED )
-  target_link_libraries( SuperLU::BLAS INTERFACE LinAlg::BLAS )
+  include(CMakeFindDependencyMacro)
+  find_dependency( LinAlg REQUIRED )
 
 endif()
 
@@ -196,7 +194,7 @@ if( SUPERLU_FOUND AND NOT TARGET SuperLU::superlu )
   add_library( SuperLU::superlu INTERFACE IMPORTED )
   set_target_properties( SuperLU::superlu PROPERTIES
     INTERFACE_INCLUDE_DIRECTORIES "${SUPERLU_INCLUDE_DIR}"
-    INTERFACE_LINK_LIBRARIES      "${SUPERLU_LIBRARIES};SuperLU::BLAS" 
+    INTERFACE_LINK_LIBRARIES      "${SUPERLU_LIBRARIES};LinAlg::BLAS" 
   )
 
 endif()

@@ -113,22 +113,14 @@ fill_out_prefix( superlu_dist )
 
 
 # Dependencies
-if( NOT TARGET SuperLU::BLAS )
-
-  find_package( LinAlg QUIET )
-
-  add_library( SuperLU::BLAS INTERFACE IMPORTED )
-  target_link_libraries( SuperLU::BLAS INTERFACE LinAlg::BLAS )
-
+include(CMakeFindDependencyMacro)
+if( NOT TARGET LinAlg::BLAS )
+  find_dependency( LinAlg REQUIRED )
 endif()
 
-if( NOT TARGET SuperLU::parmetis )
-
-  find_package( ParMETIS QUIET )
-
-  add_library( SuperLU::parmetis INTERFACE IMPORTED )
-  target_link_libraries( SuperLU::parmetis INTERFACE ParMETIS::parmetis )
-
+# Inherits MPI from ParMETIS
+if( NOT TARGET ParMETIS::parmetis )
+  find_dependency( ParMETIS REQUIRED )
 endif()
 
 
@@ -205,7 +197,7 @@ if( SUPERLU_DIST_FOUND AND NOT TARGET SuperLU::superlu_dist )
   add_library( SuperLU::superlu_dist INTERFACE IMPORTED )
   set_target_properties( SuperLU::superlu_dist PROPERTIES
     INTERFACE_INCLUDE_DIRECTORIES "${SUPERLU_DIST_INCLUDE_DIR}"
-    INTERFACE_LINK_LIBRARIES      "${SUPERLU_DIST_LIBRARIES};SuperLU::parmetis;SuperLU::BLAS" 
+    INTERFACE_LINK_LIBRARIES      "${SUPERLU_DIST_LIBRARIES};ParMETIS::parmetis;LinAlg::BLAS" 
   )
 
 endif()

@@ -88,6 +88,7 @@
 #
 #==================================================================
 
+cmake_minimum_required( VERSION 3.11 ) # Require CMake 3.11+
 # Set up some auxillary vars if hints have been set
 
 if( ptscotch_PREFIX AND NOT ptscotch_INCLUDE_DIR )
@@ -117,8 +118,24 @@ if( ptscotch_LIBRARY_DIR AND NOT scotch_LIBRARY_DIR )
 endif()
 
 
-# Try to find SCOTCH installation
-find_package( SCOTCH )
+# DEPENDENCIES
+# Make sure C is enabled
+get_property( PTSCOTCH_languages GLOBAL PROPERTY ENABLED_LANGUAGES )
+if( NOT "C" IN_LIST PTSCOTCH_languages )
+  message( FATAL_ERROR "C Language Must Be Enabled for PTSCOTCH Linkage" )
+endif()
+
+
+# SCOTCH
+if( NOT TARGET SCOTCH::scotch )
+  find_dependency( SCOTCH REQUIRED )
+endif()
+
+
+# MPI
+if( NOT TARGET MPI::MPI_C )
+  find_dependency( MPI REQUIRED )
+endif()
 
 
 # Try to find the header
@@ -219,15 +236,7 @@ if( PTSCOTCH_FOUND AND NOT TARGET PTSCOTCH::ptscotch )
   add_library( PTSCOTCH::ptscotch INTERFACE IMPORTED )
   set_target_properties( PTSCOTCH::ptscotch PROPERTIES
     INTERFACE_INCLUDE_DIRECTORIES "${PTSCOTCH_INCLUDE_DIR}"
-    INTERFACE_LINK_LIBRARIES      "${PTSCOTCH_LIBRARIES};SCOTCH::scotch" 
+    INTERFACE_LINK_LIBRARIES      "${PTSCOTCH_LIBRARIES};SCOTCH::scotch;MPI::MPI_C" 
   )
-
-
-  # Alias SCOTCH linkage 
-  add_library( PTSCOTCH::scotch INTERFACE IMPORTED )
-  set_target_properties( PTSCOTCH::scotch PROPERTIES
-    INTERFACE_LINK_LIBRARIES SCOTCH::scotch 
-  )
-    
 
 endif()
