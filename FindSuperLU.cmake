@@ -88,6 +88,7 @@
 #
 #==================================================================
 
+cmake_minimum_required( VERSION 3.11 ) # Require CMake 3.11+
 include( CMakePushCheckState )
 include( CheckLibraryExists )
 include( CheckSymbolExists )

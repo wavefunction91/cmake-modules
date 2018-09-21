@@ -88,6 +88,7 @@
 #
 #==================================================================
 
+cmake_minimum_required( VERSION 3.11 ) # Require CMake 3.11+
 # Set up some auxillary vars if hints have been set
 
 if( scotch_PREFIX AND NOT scotch_INCLUDE_DIR )
