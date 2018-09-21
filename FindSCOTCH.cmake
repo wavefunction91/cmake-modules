@@ -141,24 +141,29 @@ if( NOT scotch_LIBRARIES )
     DOC "SCOTCH Error-Exit Libraries"
   )
 
-  find_library( SCOTCH_METIS_LIBRARY
-    NAMES scotchmetis
-    HINTS ${scotch_PREFIX}
-    PATHS ${scotch_LIBRARY_DIR}
-    PATH_SUFFIXES lib lib64 lib32
-    DOC "SCOTCH-METIS compatibility Libraries"
-  )
-
 
   set( SCOTCH_LIBRARIES 
        ${SCOTCH_LIBRARY} 
        ${SCOTCH_ERR_LIBRARY}
        ${SCOTCH_ERREXIT_LIBRARY} )
 
-  if( SCOTCH_METIS_LIBRARY )
-    list( APPEND SCOTCH_LIBRARIES ${SCOTCH_METIS_LIBRARY} )
-    set( SCOTCH_metis_FOUND TRUE )
+  if( "metis" IN_LIST SCOTCH_FIND_COMPONENTS )
+
+    find_library( SCOTCH_METIS_LIBRARY
+      NAMES scotchmetis
+      HINTS ${scotch_PREFIX}
+      PATHS ${scotch_LIBRARY_DIR}
+      PATH_SUFFIXES lib lib64 lib32
+      DOC "SCOTCH-METIS compatibility Libraries"
+    )
+
+    if( SCOTCH_METIS_LIBRARY )
+      list( APPEND SCOTCH_LIBRARIES ${SCOTCH_METIS_LIBRARY} )
+      set( SCOTCH_metis_FOUND TRUE )
+    endif()
+
   endif()
+
 
 else()
 

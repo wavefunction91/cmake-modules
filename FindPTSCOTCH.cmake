@@ -174,23 +174,27 @@ if( NOT ptscotch_LIBRARIES )
     DOC "PTSCOTCH Error-Exit Libraries"
   )
 
-  find_library( PTSCOTCH_PARMETIS_LIBRARY
-    NAMES ptscotchparmetis
-    HINTS ${ptscotch_PREFIX}
-    PATHS ${ptscotch_LIBRARY_DIR}
-    PATH_SUFFIXES lib lib64 lib32
-    DOC "PTSCOTCH-ParMETIS compatibility Libraries"
-  )
-
-
   set( PTSCOTCH_LIBRARIES 
        ${PTSCOTCH_LIBRARY} 
        ${PTSCOTCH_ERR_LIBRARY}
        ${PTSCOTCH_ERREXIT_LIBRARY} )
 
-  if( PTSCOTCH_PARMETIS_LIBRARY )
-    list( APPEND PTSCOTCH_LIBRARIES ${PTSCOTCH_PARMETIS_LIBRARY} )
-    set( PTSCOTCH_parmetis_FOUND TRUE )
+
+  if( "parmetis" IN_LIST PTSCOTCH_FIND_COMPONENTS )
+
+    find_library( PTSCOTCH_PARMETIS_LIBRARY
+      NAMES ptscotchparmetis
+      HINTS ${ptscotch_PREFIX}
+      PATHS ${ptscotch_LIBRARY_DIR}
+      PATH_SUFFIXES lib lib64 lib32
+      DOC "PTSCOTCH-ParMETIS compatibility Libraries"
+    )
+
+    if( PTSCOTCH_PARMETIS_LIBRARY )
+      list( APPEND PTSCOTCH_LIBRARIES ${PTSCOTCH_PARMETIS_LIBRARY} )
+      set( PTSCOTCH_parmetis_FOUND TRUE )
+    endif()
+
   endif()
 
 else()
