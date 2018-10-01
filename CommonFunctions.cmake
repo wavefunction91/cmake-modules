@@ -1,47 +1,3 @@
-#   FindScaLAPACK.cmake
-#
-#   Finds the ScaLAPACK library.
-#
-#   This module will define the following variables:
-#   
-#     SCALAPACK_FOUND        - System has found ScaLAPACK installation
-#     SCALAPACK_LIBRARIES    - ScaLAPACK libraries
-#
-#   This module will export the following targets if SUPERLU_FOUND
-#
-#     ScaLAPACK::scalapack
-#
-#
-#
-#
-#   Proper usage:
-#
-#     project( TEST_FIND_SUPERLU C )
-#     find_package( ScaLAPACK )
-#
-#     if( SCALAPACK_FOUND )
-#       add_executable( test test.cxx )
-#       target_link_libraries( test ScaLAPACK::scalapack )
-#     endif()
-#
-#
-#
-#
-#   This module will use the following variables to change
-#   default behaviour if set
-#
-#     scalapack_PREFIX
-#     scalapack_LIBRARY_DIR
-#     scalapack_LIBRARIES
-#
-#
-#   This module also calls FindLinAlg.cmake if no LinAlg::BLAS
-#   TARGET is found. If this behaviour is not desired, ensure 
-#   that there is a proper definition of LinAlg::BLAS prior
-#   to invokation by either calling find_package( LinAlg ) 
-#   or creating a user defined target which properly links to
-#   blas
-#
 #==================================================================
 #   Copyright (c) 2018 The Regents of the University of California,
 #   through Lawrence Berkeley National Laboratory.  
@@ -86,66 +42,39 @@
 #
 #==================================================================
 
-cmake_minimum_required( VERSION 3.11 ) # Require CMake 3.11+
+function( fill_out_prefix name )
 
-include( CMakePushCheckState )
-include( CheckLibraryExists )
-include( CheckSymbolExists )
-include( FindPackageHandleStandardArgs )
+  if( ${name}_PREFIX AND NOT ${name}_INCLUDE_DIR )
+    set( ${name}_INCLUDE_DIR ${${name}_PREFIX}/include PARENT_SCOPE )
+  endif()
 
-include( ${CMAKE_CURRENT_LIST_DIR}/CommonFunctions )
+  if( ${name}_PREFIX AND NOT ${name}_LIBRARY_DIR )
+    set( ${name}_LIBRARY_DIR 
+         "${${name}_PREFIX}/lib;${${name}_PREFIX}/lib32;${${name}_PREFIX}/lib64"
+         PARENT_SCOPE
+    )
+  endif()
 
-fill_out_prefix( scalapack )
+endfunction()
 
+function( copy_meta_data _src _dest )
 
+  if( ${_src}_LIBRARIES AND NOT ${_dest}_LIBRARIES )
+    set( ${_dest}_LIBRARIES ${${_src}_LIBRARIES} PARENT_SCOPE )
+  endif()
 
-# Dependencies
-include(CMakeFindDependencyMacro)
-if( NOT TARGET LinAlg::BLAS )
-  find_package( LinAlg REQUIRED )
-endif()
+  if( ${_src}_PREFIX AND NOT ${_dest}_PREFIX )
+    set( ${_dest}_PREFIX ${${_src}_PREFIX} PARENT_SCOPE )
+  endif()
 
-# MPI
-if( NOT TARGET MPI::MPI_C )
-  find_package( MPI REQUIRED )
-endif()
+  if( ${_src}_INCLUDE_DIR AND NOT ${_dest}_INCLUDE_DIR )
+    set( ${_dest}_INCLUDE_DIR ${${_src}_INCLUDE_DIR} PARENT_SCOPE )
+  endif()
 
+  if( ${_src}_LIBRARY_DIR AND NOT ${_dest}_LIBRARY_DIR )
+    set( ${_dest}_LIBRARY_DIR ${${_src}_LIBRARY_DIR} PARENT_SCOPE )
+  endif()
 
+endfunction()
 
-# Try to find libraries if not already set
-if( NOT scalapack_LIBRARIES )
-
-  find_library( SCALAPACK_LIBRARIES
-    NAMES scalapack
-    HINTS ${scalapack_PREFIX}
-    PATHS ${scalapack_LIBRARY_DIR}
-    PATH_SUFFIXES lib lib64 lib32
-    DOC "ScaLAPACK Libraries"
-  )
-
-else()
-
-  # FIXME: Check if files exists at least?
-  set( SCALAPACK_LIBRARIES ${scalapack_LIBRARIES} )
-
-endif()
-
-
-# Determine if we've found SCALAPACK
-mark_as_advanced( SCALAPACK_FOUND SCALAPACK_LIBRARIES )
-
-include(FindPackageHandleStandardArgs)
-find_package_handle_standard_args( SCALAPACK
-  REQUIRED_VARS SCALAPACK_LIBRARIES
-)
-
-# Export target
-if( SCALAPACK_FOUND AND NOT TARGET ScaLAPACK::scalapack )
-
-  add_library( ScaLAPACK::scalapack INTERFACE IMPORTED )
-  set_target_properties( ScaLAPACK::scalapack PROPERTIES
-    INTERFACE_LINK_LIBRARIES      "${SCALAPACK_LIBRARIES};MPI::MPI_C;LinAlg::BLAS" 
-  )
-
-endif()
 

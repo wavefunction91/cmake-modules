@@ -94,20 +94,7 @@ include( CheckLibraryExists )
 include( CheckSymbolExists )
 include( FindPackageHandleStandardArgs )
 
-function( fill_out_prefix name )
-
-  if( ${name}_PREFIX AND NOT ${name}_INCLUDE_DIR )
-    set( ${name}_INCLUDE_DIR ${${name}_PREFIX}/include PARENT_SCOPE )
-  endif()
-
-  if( ${name}_PREFIX AND NOT ${name}_LIBRARY_DIR )
-    set( ${name}_LIBRARY_DIR 
-         "${${name}_PREFIX}/lib;${${name}_PREFIX}/lib32;${${name}_PREFIX}/lib64"
-         PARENT_SCOPE
-    )
-  endif()
-
-endfunction()
+include( ${CMAKE_CURRENT_LIST_DIR}/CommonFunctions )
 
 fill_out_prefix( superlu )
 

@@ -101,66 +101,16 @@ include( CheckLibraryExists )
 include( CheckSymbolExists )
 include( FindPackageHandleStandardArgs )
 
-function( fill_out_prefix name )
 
-  if( ${name}_PREFIX AND NOT ${name}_INCLUDE_DIR )
-    set( ${name}_INCLUDE_DIR ${${name}_PREFIX}/include PARENT_SCOPE )
-  endif()
-
-  if( ${name}_PREFIX AND NOT ${name}_LIBRARY_DIR )
-    set( ${name}_LIBRARY_DIR 
-         "${${name}_PREFIX}/lib;${${name}_PREFIX}/lib32;${${name}_PREFIX}/lib64"
-         PARENT_SCOPE
-    )
-  endif()
-
-endfunction()
+include( ${CMAKE_CURRENT_LIST_DIR}/CommonFunctions )
 
 fill_out_prefix( linalg )
 
-if( linalg_LIBRARIES AND NOT linalg_BLAS_LIBRARIES )
-  set( linalg_BLAS_LIBRARIES ${linalg_LIBRARIES} )
-endif()
-if( linalg_LIBRARIES AND NOT linalg_LAPACK_LIBRARIES )
-  set( linalg_LAPACK_LIBRARIES ${linalg_LIBRARIES} )
-endif()
+copy_meta_data( linalg linalg_BLAS   )
+copy_meta_data( linalg linalg_LAPACK )
 
-
-if( linalg_PREFIX AND NOT linalg_BLAS_PREFIX )
-  set( linalg_BLAS_PREFIX ${linalg_PREFIX} )
-endif()
-
-if( linalg_PREFIX AND NOT linalg_LAPACK_PREFIX )
-  set( linalg_LAPACK_PREFIX ${linalg_PREFIX} )
-endif()
-
-if( linalg_INCLUDE_DIR AND NOT linalg_BLAS_INCLUDE_DIR )
-  set( linalg_BLAS_INCLUDE_DIR ${linalg_INCLUDE_DIR} )
-endif()
-
-if( linalg_INCLUDE_DIR AND NOT linalg_LAPACK_INCLUDE_DIR )
-  set( linalg_LAPACK_INCLUDE_DIR ${linalg_INCLUDE_DIR} )
-endif()
-
-if( linalg_LIBRARY_DIR AND NOT linalg_BLAS_LIBRARY_DIR )
-  set( linalg_BLAS_LIBRARY_DIR ${linalg_LIBRARY_DIR} )
-endif()
-
-if( linalg_LIBRARY_DIR AND NOT linalg_LAPACK_LIBRARY_DIR )
-  set( linalg_LAPACK_LIBRARY_DIR ${linalg_LIBRARY_DIR} )
-endif()
-
-
-
-
-
-
-
-
-fill_out_prefix( linalg_BLAS )
+fill_out_prefix( linalg_BLAS   )
 fill_out_prefix( linalg_LAPACK )
-
-
 
 # Handle BLAS
 
