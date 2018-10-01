@@ -102,7 +102,7 @@ include( CheckSymbolExists )
 include( FindPackageHandleStandardArgs )
 
 
-include( ${CMAKE_CURRENT_LIST_DIR}/CommonFunctions )
+include( ${CMAKE_CURRENT_LIST_DIR}/CommonFunctions.cmake )
 
 fill_out_prefix( linalg )
 
