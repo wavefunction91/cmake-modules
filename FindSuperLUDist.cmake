@@ -117,7 +117,7 @@ endif()
 find_path( SUPERLU_DIST_INCLUDE_DIR
   NAMES superlu_defs.h
   HINTS ${superlu_dist_PREFIX}
-  PATHS ${superlu_dist_INCLUDE_DIE}
+  PATHS ${superlu_dist_INCLUDE_DIR}
   PATH_SUFFIXES include
   DOC "Local of SuperLU_DIST Headers"
 )
