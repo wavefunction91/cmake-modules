@@ -4,11 +4,11 @@
 #
 #   This module will define the following variables:
 #   
-#     SUPERLU_DIST_FOUND        - System has found SuperLU_Dist installation
-#     SUPERLU_DIST_INCLUDE_DIR  - Location of SuperLU_Dist headers
-#     SUPERLU_DIST_LIBRARIES    - SuperLU_Dist libraries
+#     SuperLU_Dist_FOUND        - System has found SuperLU_Dist installation
+#     SuperLU_Dist_INCLUDE_DIR  - Location of SuperLU_Dist headers
+#     SuperLU_Dist_LIBRARIES    - SuperLU_Dist libraries
 #
-#   This module will export the following targets if SUPERLU_FOUND
+#   This module will export the following targets if SuperLU_FOUND
 #
 #     SuperLU::superlu_dist
 #
@@ -17,10 +17,10 @@
 #
 #   Proper usage:
 #
-#     project( TEST_FIND_SUPERLUDIST C )
+#     project( TEST_FIND_SuperLUDist C )
 #     find_package( SuperLUDist )
 #
-#     if( SUPERLU_DIST_FOUND )
+#     if( SuperLU_Dist_FOUND )
 #       add_executable( test test.cxx )
 #       target_link_libraries( test SuperLUDist::superlu_dist )
 #     endif()
@@ -114,12 +114,12 @@ endif()
 
 
 # Try to find headers
-find_path( SUPERLU_DIST_INCLUDE_DIR
+find_path( SuperLU_Dist_INCLUDE_DIR
   NAMES superlu_defs.h
   HINTS ${superlu_dist_PREFIX}
   PATHS ${superlu_dist_INCLUDE_DIR}
   PATH_SUFFIXES include
-  DOC "Local of SuperLU_DIST Headers"
+  DOC "Local of SuperLU_Dist Headers"
 )
 
 
@@ -127,41 +127,41 @@ find_path( SUPERLU_DIST_INCLUDE_DIR
 # Try to find libraries if not already set
 if( NOT superlu_dist_LIBRARIES )
 
-  find_library( SUPERLU_DIST_LIBRARIES
+  find_library( SuperLU_Dist_LIBRARIES
     NAMES superlu_dist
     HINTS ${superlu_dist_PREFIX}
     PATHS ${superlu_dist_LIBRARY_DIR}
     PATH_SUFFIXES lib lib64 lib32
-    DOC "SuperLU_DIST Libraries"
+    DOC "SuperLU_Dist Libraries"
   )
 
 else()
 
   # FIXME: Check if files exists at least?
-  set( SUPERLU_DIST_LIBRARIES ${superlu_dist_LIBRARIES} )
+  set( SuperLU_Dist_LIBRARIES ${superlu_dist_LIBRARIES} )
 
 endif()
 
 # Check version
-if( EXISTS ${SUPERLU_DIST_INCLUDE_DIR}/superlu_defs.h )
+if( EXISTS ${SuperLU_Dist_INCLUDE_DIR}/superlu_defs.h )
   set( version_pattern 
-  "^#define[\t ]+SUPERLU_DIST_(MAJOR|MINOR|PATCH)_VERSION[\t ]+([0-9\\.]+)$"
+  "^#define[\t ]+SuperLU_Dist_(MAJOR|MINOR|PATCH)_VERSION[\t ]+([0-9\\.]+)$"
   )
-  file( STRINGS ${SUPERLU_DIST_INCLUDE_DIR}/superlu_defs.h superlu_dist_version
+  file( STRINGS ${SuperLU_Dist_INCLUDE_DIR}/superlu_defs.h superlu_dist_version
         REGEX ${version_pattern} )
   
   foreach( match ${superlu_dist_version} )
   
-    if(SUPERLU_DIST_VERSION_STRING)
-      set(SUPERLU_DIST_VERSION_STRING "${SUPERLU_DIST_VERSION_STRING}.")
+    if(SuperLU_Dist_VERSION_STRING)
+      set(SuperLU_Dist_VERSION_STRING "${SuperLU_Dist_VERSION_STRING}.")
     endif()
   
     string(REGEX REPLACE ${version_pattern} 
-      "${SUPERLU_DIST_VERSION_STRING}\\2" 
-      SUPERLU_DIST_VERSION_STRING ${match}
+      "${SuperLU_Dist_VERSION_STRING}\\2" 
+      SuperLU_Dist_VERSION_STRING ${match}
     )
   
-    set(SUPERLU_DIST_VERSION_${CMAKE_MATCH_1} ${CMAKE_MATCH_2})
+    set(SuperLU_Dist_VERSION_${CMAKE_MATCH_1} ${CMAKE_MATCH_2})
   
   endforeach()
   
@@ -171,22 +171,22 @@ endif()
 
 
 
-# Determine if we've found SUPERLU_DIST
-mark_as_advanced( SUPERLU_DIST_FOUND SUPERLU_DIST_INCLUDE_DIR SUPERLU_DIST_LIBRARIES )
+# Determine if we've found SuperLU_Dist
+mark_as_advanced( SuperLU_Dist_FOUND SuperLU_Dist_INCLUDE_DIR SuperLU_Dist_LIBRARIES )
 
 include(FindPackageHandleStandardArgs)
-find_package_handle_standard_args( SUPERLU_DIST
-  REQUIRED_VARS SUPERLU_DIST_LIBRARIES SUPERLU_DIST_INCLUDE_DIR
-  VERSION_VAR SUPERLU_DIST_VERSION_STRING
+find_package_handle_standard_args( SuperLU_Dist
+  REQUIRED_VARS SuperLU_Dist_LIBRARIES SuperLU_Dist_INCLUDE_DIR
+  VERSION_VAR SuperLU_Dist_VERSION_STRING
 )
 
 # Export target
-if( SUPERLU_DIST_FOUND AND NOT TARGET SuperLU::superlu_dist )
+if( SuperLU_Dist_FOUND AND NOT TARGET SuperLU::superlu_dist )
 
   add_library( SuperLU::superlu_dist INTERFACE IMPORTED )
   set_target_properties( SuperLU::superlu_dist PROPERTIES
-    INTERFACE_INCLUDE_DIRECTORIES "${SUPERLU_DIST_INCLUDE_DIR}"
-    INTERFACE_LINK_LIBRARIES      "${SUPERLU_DIST_LIBRARIES};ParMETIS::parmetis;LinAlg::BLAS" 
+    INTERFACE_INCLUDE_DIRECTORIES "${SuperLU_Dist_INCLUDE_DIR}"
+    INTERFACE_LINK_LIBRARIES      "${SuperLU_Dist_LIBRARIES};ParMETIS::parmetis;LinAlg::BLAS" 
   )
 
 endif()

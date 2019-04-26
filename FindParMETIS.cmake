@@ -4,16 +4,16 @@
 #
 #   This module will define the following variables:
 #   
-#     PARMETIS_FOUND        - System has found ParMETIS installation
-#     PARMETIS_INCLUDE_DIR  - Location of ParMETIS headers
-#     PARMETIS_LIBRARIES    - ParMETIS libraries
-#     PARMETIS_USES_ILP64   - Whether ParMETIS was compiled with ILP64
+#     ParMETIS_FOUND        - System has found ParMETIS installation
+#     ParMETIS_INCLUDE_DIR  - Location of ParMETIS headers
+#     ParMETIS_LIBRARIES    - ParMETIS libraries
+#     ParMETIS_USES_ILP64   - Whether ParMETIS was compiled with ILP64
 
 #   This module can handle the following COMPONENTS
 #
 #     ilp64 - 64-bit index integers
 #
-#   This module will export the following targets if PARMETIS_FOUND
+#   This module will export the following targets if ParMETIS_FOUND
 #
 #     ParMETIS::parmetis
 #
@@ -22,10 +22,10 @@
 #
 #   Proper usage:
 #
-#     project( TEST_FIND_PARMETIS C )
+#     project( TEST_FIND_ParMETIS C )
 #     find_package( ParMETIS )
 #
-#     if( PARMETIS_FOUND )
+#     if( ParMETIS_FOUND )
 #       add_executable( test test.cxx )
 #       target_link_libraries( test ParMETIS::parmetis )
 #     endif()
@@ -151,7 +151,7 @@ endif()
 
 
 # Try to find the header
-find_path( PARMETIS_INCLUDE_DIR 
+find_path( ParMETIS_INCLUDE_DIR 
   NAMES parmetis.h
   HINTS ${parmetis_PREFIX}
   PATHS ${parmetis_INCLUDE_DIR}
@@ -162,7 +162,7 @@ find_path( PARMETIS_INCLUDE_DIR
 # Try to find libraries if not already set
 if( NOT parmetis_LIBRARIES )
 
-  find_library( PARMETIS_LIBRARIES
+  find_library( ParMETIS_LIBRARIES
     NAMES parmetis
     HINTS ${parmetis_PREFIX}
     PATHS ${parmetis_LIBRARY_DIR}
@@ -173,31 +173,31 @@ if( NOT parmetis_LIBRARIES )
 else()
 
   # FIXME: Check if files exists at least?
-  set( PARMETIS_LIBRARIES ${parmetis_LIBRARIES} )
+  set( ParMETIS_LIBRARIES ${parmetis_LIBRARIES} )
 
 endif()
 
 # Check version
-if( EXISTS ${PARMETIS_INCLUDE_DIR}/parmetis.h )
+if( EXISTS ${ParMETIS_INCLUDE_DIR}/parmetis.h )
 
   set( version_pattern 
-  "^#define[\t ]+PARMETIS_(MAJOR|MINOR|SUBMINOR)_VERSION[\t ]+([0-9\\.]+)$"
+  "^#define[\t ]+ParMETIS_(MAJOR|MINOR|SUBMINOR)_VERSION[\t ]+([0-9\\.]+)$"
   )
-  file( STRINGS ${PARMETIS_INCLUDE_DIR}/parmetis.h parmetis_version
+  file( STRINGS ${ParMETIS_INCLUDE_DIR}/parmetis.h parmetis_version
         REGEX ${version_pattern} )
   
   foreach( match ${parmetis_version} )
   
-    if(PARMETIS_VERSION_STRING)
-      set(PARMETIS_VERSION_STRING "${PARMETIS_VERSION_STRING}.")
+    if(ParMETIS_VERSION_STRING)
+      set(ParMETIS_VERSION_STRING "${ParMETIS_VERSION_STRING}.")
     endif()
   
     string(REGEX REPLACE ${version_pattern} 
-      "${PARMETIS_VERSION_STRING}\\2" 
-      PARMETIS_VERSION_STRING ${match}
+      "${ParMETIS_VERSION_STRING}\\2" 
+      ParMETIS_VERSION_STRING ${match}
     )
   
-    set(PARMETIS_VERSION_${CMAKE_MATCH_1} ${CMAKE_MATCH_2})
+    set(ParMETIS_VERSION_${CMAKE_MATCH_1} ${CMAKE_MATCH_2})
   
   endforeach()
   
@@ -209,35 +209,35 @@ endif()
 # Check ILP64 (Inherits from METIS)
 if( METIS_FOUND )
 
-  set( PARMETIS_USES_ILP64 ${METIS_USES_ILP64} )
+  set( ParMETIS_USES_ILP64 ${METIS_USES_ILP64} )
 
 endif()
 
 # Handle components
-if( PARMETIS_USES_ILP64 )
-  set( PARMETIS_ilp64_FOUND TRUE )
+if( ParMETIS_USES_ILP64 )
+  set( ParMETIS_ilp64_FOUND TRUE )
 endif()
 
 
 
 
 # Determine if we've found ParMETIS
-mark_as_advanced( PARMETIS_FOUND PARMETIS_INCLUDE_DIR PARMETIS_LIBRARIES )
+mark_as_advanced( ParMETIS_FOUND ParMETIS_INCLUDE_DIR ParMETIS_LIBRARIES )
 
 include(FindPackageHandleStandardArgs)
-find_package_handle_standard_args( PARMETIS
-  REQUIRED_VARS PARMETIS_LIBRARIES PARMETIS_INCLUDE_DIR METIS_FOUND 
-  VERSION_VAR PARMETIS_VERSION_STRING
+find_package_handle_standard_args( ParMETIS
+  REQUIRED_VARS ParMETIS_LIBRARIES ParMETIS_INCLUDE_DIR METIS_FOUND 
+  VERSION_VAR ParMETIS_VERSION_STRING
   HANDLE_COMPONENTS
 )
 
 # Export target
-if( PARMETIS_FOUND AND NOT TARGET ParMETIS::parmetis )
+if( ParMETIS_FOUND AND NOT TARGET ParMETIS::parmetis )
 
   add_library( ParMETIS::parmetis INTERFACE IMPORTED )
   set_target_properties( ParMETIS::parmetis PROPERTIES
-    INTERFACE_INCLUDE_DIRECTORIES "${PARMETIS_INCLUDE_DIR}"
-    INTERFACE_LINK_LIBRARIES      "${PARMETIS_LIBRARIES};METIS::metis;MPI::MPI_C" 
+    INTERFACE_INCLUDE_DIRECTORIES "${ParMETIS_INCLUDE_DIR}"
+    INTERFACE_LINK_LIBRARIES      "${ParMETIS_LIBRARIES};METIS::metis;MPI::MPI_C" 
   )
 
 endif()

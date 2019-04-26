@@ -4,25 +4,25 @@
 #
 #   This module will define the following variables:
 #   
-#     SUPERLU_FOUND        - System has found SuperLU installation
-#     SUPERLU_INCLUDE_DIR  - Location of SuperLU headers
-#     SUPERLU_LIBRARIES    - SuperLU libraries
+#     SuperLU_FOUND        - System has found SuperLU installation
+#     SuperLU_INCLUDE_DIR  - Location of SuperLU headers
+#     SuperLU_LIBRARIES    - SuperLU libraries
 #
-#   This module will export the following targets if SUPERLU_FOUND
+#   This module will export the following targets if SuperLU_FOUND
 #
-#     SUPERLU::superlu
+#     SuperLU::superlu
 #
 #
 #
 #
 #   Proper usage:
 #
-#     project( TEST_FIND_SUPERLU C )
-#     find_package( SUPERLU )
+#     project( TEST_FIND_SuperLU C )
+#     find_package( SuperLU )
 #
-#     if( SUPERLU_FOUND )
+#     if( SuperLU_FOUND )
 #       add_executable( test test.cxx )
-#       target_link_libraries( test SUPERLU::superlu )
+#       target_link_libraries( test SuperLU::superlu )
 #     endif()
 #
 #
@@ -110,7 +110,7 @@ endif()
 
 
 # Try to find headers
-find_path( SUPERLU_INCLUDE_DIR
+find_path( SuperLU_INCLUDE_DIR
   NAMES slu_util.h
   HINTS ${superlu_PREFIX}
   PATHS ${superlu_INCLUDE_DIR}
@@ -123,41 +123,41 @@ find_path( SUPERLU_INCLUDE_DIR
 # Try to find libraries if not already set
 if( NOT superlu_LIBRARIES )
 
-  find_library( SUPERLU_LIBRARIES
+  find_library( SuperLU_LIBRARIES
     NAMES superlu
     HINTS ${superlu_PREFIX}
     PATHS ${superlu_LIBRARY_DIR}
     PATH_SUFFIXES lib lib64 lib32
-    DOC "SUPERLU Libraries"
+    DOC "SuperLU Libraries"
   )
 
 else()
 
   # FIXME: Check if files exists at least?
-  set( SUPERLU_LIBRARIES ${superlu_LIBRARIES} )
+  set( SuperLU_LIBRARIES ${superlu_LIBRARIES} )
 
 endif()
 
 # Check version
-if( EXISTS ${SUPERLU_INCLUDE_DIR}/slu_util.h )
+if( EXISTS ${SuperLU_INCLUDE_DIR}/slu_util.h )
   set( version_pattern 
-  "^#define[\t ]+SUPERLU_(MAJOR|MINOR|PATCH)_VERSION[\t ]+([0-9\\.]+)$"
+  "^#define[\t ]+SuperLU_(MAJOR|MINOR|PATCH)_VERSION[\t ]+([0-9\\.]+)$"
   )
-  file( STRINGS ${SUPERLU_INCLUDE_DIR}/slu_util.h superlu_version
+  file( STRINGS ${SuperLU_INCLUDE_DIR}/slu_util.h superlu_version
         REGEX ${version_pattern} )
   
   foreach( match ${superlu_version} )
   
-    if(SUPERLU_VERSION_STRING)
-      set(SUPERLU_VERSION_STRING "${SUPERLU_VERSION_STRING}.")
+    if(SuperLU_VERSION_STRING)
+      set(SuperLU_VERSION_STRING "${SuperLU_VERSION_STRING}.")
     endif()
   
     string(REGEX REPLACE ${version_pattern} 
-      "${SUPERLU_VERSION_STRING}\\2" 
-      SUPERLU_VERSION_STRING ${match}
+      "${SuperLU_VERSION_STRING}\\2" 
+      SuperLU_VERSION_STRING ${match}
     )
   
-    set(SUPERLU_VERSION_${CMAKE_MATCH_1} ${CMAKE_MATCH_2})
+    set(SuperLU_VERSION_${CMAKE_MATCH_1} ${CMAKE_MATCH_2})
   
   endforeach()
   
@@ -167,22 +167,22 @@ endif()
 
 
 
-# Determine if we've found SUPERLU
-mark_as_advanced( SUPERLU_FOUND SUPERLU_INCLUDE_DIR SUPERLU_LIBRARIES )
+# Determine if we've found SuperLU
+mark_as_advanced( SuperLU_FOUND SuperLU_INCLUDE_DIR SuperLU_LIBRARIES )
 
 include(FindPackageHandleStandardArgs)
-find_package_handle_standard_args( SUPERLU
-  REQUIRED_VARS SUPERLU_LIBRARIES SUPERLU_INCLUDE_DIR
-  VERSION_VAR SUPERLU_VERSION_STRING
+find_package_handle_standard_args( SuperLU
+  REQUIRED_VARS SuperLU_LIBRARIES SuperLU_INCLUDE_DIR
+  VERSION_VAR SuperLU_VERSION_STRING
 )
 
 # Export target
-if( SUPERLU_FOUND AND NOT TARGET SuperLU::superlu )
+if( SuperLU_FOUND AND NOT TARGET SuperLU::superlu )
 
   add_library( SuperLU::superlu INTERFACE IMPORTED )
   set_target_properties( SuperLU::superlu PROPERTIES
-    INTERFACE_INCLUDE_DIRECTORIES "${SUPERLU_INCLUDE_DIR}"
-    INTERFACE_LINK_LIBRARIES      "${SUPERLU_LIBRARIES};LinAlg::BLAS" 
+    INTERFACE_INCLUDE_DIRECTORIES "${SuperLU_INCLUDE_DIR}"
+    INTERFACE_LINK_LIBRARIES      "${SuperLU_LIBRARIES};LinAlg::BLAS" 
   )
 
 endif()

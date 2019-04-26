@@ -4,8 +4,8 @@
 #
 #   This module will define the following variables:
 #   
-#     SCALAPACK_FOUND        - System has found ScaLAPACK installation
-#     SCALAPACK_LIBRARIES    - ScaLAPACK libraries
+#     ScaLAPACK_FOUND        - System has found ScaLAPACK installation
+#     ScaLAPACK_LIBRARIES    - ScaLAPACK libraries
 #
 #   This module will export the following targets if SUPERLU_FOUND
 #
@@ -19,7 +19,7 @@
 #     project( TEST_FIND_SUPERLU C )
 #     find_package( ScaLAPACK )
 #
-#     if( SCALAPACK_FOUND )
+#     if( ScaLAPACK_FOUND )
 #       add_executable( test test.cxx )
 #       target_link_libraries( test ScaLAPACK::scalapack )
 #     endif()
@@ -115,7 +115,7 @@ endif()
 # Try to find libraries if not already set
 if( NOT scalapack_LIBRARIES )
 
-  find_library( SCALAPACK_LIBRARIES
+  find_library( ScaLAPACK_LIBRARIES
     NAMES scalapack
     HINTS ${scalapack_PREFIX}
     PATHS ${scalapack_LIBRARY_DIR}
@@ -126,25 +126,25 @@ if( NOT scalapack_LIBRARIES )
 else()
 
   # FIXME: Check if files exists at least?
-  set( SCALAPACK_LIBRARIES ${scalapack_LIBRARIES} )
+  set( ScaLAPACK_LIBRARIES ${scalapack_LIBRARIES} )
 
 endif()
 
 
-# Determine if we've found SCALAPACK
-mark_as_advanced( SCALAPACK_FOUND SCALAPACK_LIBRARIES )
+# Determine if we've found ScaLAPACK
+mark_as_advanced( ScaLAPACK_FOUND ScaLAPACK_LIBRARIES )
 
 include(FindPackageHandleStandardArgs)
-find_package_handle_standard_args( SCALAPACK
-  REQUIRED_VARS SCALAPACK_LIBRARIES
+find_package_handle_standard_args( ScaLAPACK
+  REQUIRED_VARS ScaLAPACK_LIBRARIES
 )
 
 # Export target
-if( SCALAPACK_FOUND AND NOT TARGET ScaLAPACK::scalapack )
+if( ScaLAPACK_FOUND AND NOT TARGET ScaLAPACK::scalapack )
 
   add_library( ScaLAPACK::scalapack INTERFACE IMPORTED )
   set_target_properties( ScaLAPACK::scalapack PROPERTIES
-    INTERFACE_LINK_LIBRARIES      "${SCALAPACK_LIBRARIES};MPI::MPI_C;LinAlg::BLAS" 
+    INTERFACE_LINK_LIBRARIES      "${ScaLAPACK_LIBRARIES};MPI::MPI_C;LinAlg::BLAS" 
   )
 
 endif()
