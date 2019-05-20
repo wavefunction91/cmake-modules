@@ -34,7 +34,7 @@ find_path( ibmessl_INCLUDE_DIR
 find_library( ibmessl_LIBRARY
   NAMES ${ibmessl_LIBRARY_NAME}
   HINTS ${ibmessl_PREFIX}
-  PATHS ${ibmessl_LIBRARY_DIR}
+  PATHS ${ibmessl_LIBRARY_DIR} ${CMAKE_C_IMPLICIT_LINK_DIRECTORIES} 
   PATH_SUFFIXES lib lib64 lib32
   DOC "IBM(R) ESSL Library"
 )

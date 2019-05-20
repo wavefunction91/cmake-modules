@@ -87,6 +87,11 @@ else()
   endif()
 endif()
 
+
+if( NOT intelmkl_PREFIX )
+  set( intelmkl_PREFIX $ENV{MKLROOT} )
+endif()
+
 find_path( intelmkl_INCLUDE_DIR
   NAMES mkl.h
   HINTS ${intelmkl_PREFIX}
@@ -98,7 +103,7 @@ find_path( intelmkl_INCLUDE_DIR
 find_library( intelmkl_LIBRARY
   NAMES ${intelmkl_LIBRARY_NAME}
   HINTS ${intelmkl_PREFIX}
-  PATHS ${intelmkl_LIBRARY_DIR}
+  PATHS ${intelmkl_LIBRARY_DIR} ${CMAKE_C_IMPLICIT_LINK_DIRECTORIES}
   PATH_SUFFIXES lib/intel64 lib/ia32
   DOC "Intel(R) MKL Library"
 )
@@ -106,7 +111,7 @@ find_library( intelmkl_LIBRARY
 find_library( intelmkl_THREAD_LIBRARY
   NAMES ${intelmkl_THREAD_LIBRARY_NAME}
   HINTS ${intelmkl_PREFIX}
-  PATHS ${intelmkl_LIBRARY_DIR}
+  PATHS ${intelmkl_LIBRARY_DIR} ${CMAKE_C_IMPLICIT_LINK_DIRECTORIES}
   PATH_SUFFIXES lib/intel64 lib/ia32
   DOC "Intel(R) MKL THREAD Library"
 )
@@ -114,7 +119,7 @@ find_library( intelmkl_THREAD_LIBRARY
 find_library( intelmkl_CORE_LIBRARY
   NAMES ${intelmkl_CORE_LIBRARY_NAME}
   HINTS ${intelmkl_PREFIX}
-  PATHS ${intelmkl_LIBRARY_DIR}
+  PATHS ${intelmkl_LIBRARY_DIR} ${CMAKE_C_IMPLICIT_LINK_DIRECTORIES}
   PATH_SUFFIXES lib/intel64 lib/ia32
   DOC "Intel(R) MKL CORE Library"
 )
