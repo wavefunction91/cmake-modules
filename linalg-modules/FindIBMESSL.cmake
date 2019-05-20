@@ -44,7 +44,7 @@ if( ibmessl_INCLUDE_DIR )
 endif()
 
 if( ibmessl_LIBRARY )
-  set( IBMESSL_LIBRARIES ${ibmessl_LIBRARIES} )
+  set( IBMESSL_LIBRARIES ${ibmessl_LIBRARY} )
 endif()
 
 include(FindPackageHandleStandardArgs)
