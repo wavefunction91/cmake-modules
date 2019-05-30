@@ -11,7 +11,7 @@ include( ${CMAKE_CURRENT_LIST_DIR}/CommonFunctions.cmake )
 fill_out_prefix( linalg )
 
 if( NOT LinAlg_BLAS_PREFERENCE_LIST )
-  set( LinAlg_BLAS_PREFERENCE_LIST "IntelMKL" "IBMESSL" "OpenBLAS" "ReferenceBLAS" )
+  set( LinAlg_BLAS_PREFERENCE_LIST "IntelMKL" "IBMESSL" "BLIS" "OpenBLAS" "ReferenceBLAS" )
 endif()
 
 
@@ -19,8 +19,6 @@ if( NOT linalg_LIBRARIES )
 
   list( APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR}/linalg-modules )
   foreach( blas_type ${LinAlg_BLAS_PREFERENCE_LIST} )
-
-    #message( STATUS "Checking ${blas_type}" )
 
     string( TOLOWER ${blas_type} blas_lower_case )
     set( ${blas_lower_case}_PREFIX      ${linalg_PREFIX}      )
@@ -35,6 +33,8 @@ if( NOT linalg_LIBRARIES )
         set( linalg_LIBRARIES IntelMKL::mkl )
       elseif( ${blas_type} MATCHES "IBMESSL"       )
         set( linalg_LIBRARIES IBMESSL::essl )
+      elseif( ${blas_type} MATCHES "BLIS"      )
+        set( linalg_LIBRARIES BLIS::blis )
       elseif( ${blas_type} MATCHES "OpenBLAS"      )
         set( linalg_LIBRARIES OpenBLAS::openblas )
       elseif( ${blas_type} MATCHES "ReferenceBLAS" ) 
