@@ -20,6 +20,11 @@ if( referencelapack_LIBRARY )
   set( ReferenceLAPACK_LIBRARIES ${referencelapack_LIBRARY} )
 endif()
 
+
+# Reference LAPACK is always LP64
+set( ReferenceLAPACK_ilp64_FOUND FALSE )
+set( ReferenceLAPACK_lp64_FOUND  TRUE  )
+
 include(FindPackageHandleStandardArgs)
 find_package_handle_standard_args( ReferenceLAPACK
 #  REQUIRED_VARS ReferenceLAPACK_LIBRARIES ReferenceLAPACK_INCLUDE_DIR

@@ -15,21 +15,16 @@
 #    This module will export the following CMake TARGETS if possible
 #
 #      IntelMKL::mkl
-#      IntelMKL::lp64_sequential
-#      IntelMKL::lp64_openmp_intel
-#      IntelMKL::lp64_openmp_gnu
-#      IntelMKL::lp64_openmp_pgi
-#      IntekMKL::lp64_tbb
-#      IntelMKL::ilp64_sequential
-#      IntelMKL::ilp64_openmp_intel
-#      IntelMKL::ilp64_openmp_gnu
-#      IntelMKL::ilp64_openmp_pgi
-#      IntekMKL::ilp64_tbb
 #
-#      intelmkl_PREFERS_STATIC          - default ON
-#      intelmkl_PREFERS_ILP64           - default OFF
+#      intelmkl_PREFERS_STATIC          - default OFF
 #      intelmkl_PREFERED_THREAD_LEVEL   - ( sequential, openmp, tbb ) default: openmp
 #      intelmkl_PREFERED_THREAD_LIBRARY - ( intel, gnu, pgi )         default: depends on compiler
+
+
+# SANITY CHECK
+if( "ilp64" IN_LIST IntelMKL_FIND_COMPONENTS AND "lp64" IN_LIST IntelMKL_FIND_COMPONENTS )
+  message( FATAL_ERROR "IntelMKL cannot link to both ILP64 and LP64 iterfaces" )
+endif()
 
 # MKL lib names
 if( intelmkl_PREFERS_STATIC )
@@ -58,26 +53,18 @@ if( NOT intelmkl_PREFERED_THREAD_LEVEL )
   set( intelmkl_PREFERED_THREAD_LEVEL "openmp" )
 endif()
 
-# MKL Library
-if( intelmkl_PREFERS_ILP64 )
-  set( IntelMKL_COMPILE_DEFINITIONS "MKL_ILP64" )
-  if( CMAKE_C_COMPILER_ID MATCHES "GNU" )
-    set( IntelMKL_C_COMPILE_FLAGS        "-m64" )
-    set( IntelMKL_Fortran_COMPILE_FLAGS  "-m64" "-fdefault-integer-8" )
-  elseif( CMAKE_C_COMPILER_ID MATCHES "PGI" )
-    set( IntelMKL_Fortran_COMPILE_FLAGS "-i8" )
-  endif()
-  set( intelmkl_LIBRARY_NAME ${intelmkl_ILP64_LIBRARY_NAME} )
-else()
-  set( intelmkl_LIBRARY_NAME ${intelmkl_LP64_LIBRARY_NAME} )
+if( NOT intelmkl_PREFIX )
+  set( intelmkl_PREFIX $ENV{MKLROOT} )
 endif()
+
+
 
 # MKL Threads
 if( intelmkl_PREFERED_THREAD_LEVEL MATCHES "sequential" )
   set( intelmkl_THREAD_LIBRARY_NAME ${intelmkl_SEQUENTIAL_LIBRARY_NAME} )
 elseif( intelmkl_PREFERED_THREAD_LEVEL MATCHES "tbb" )
   set( intelmkl_THREAD_LIBRARY_NAME ${intelmkl_TBB_LIBRARY_NAME} )
-else()
+else() # OpenMP
   if( CMAKE_C_COMPILER_ID MATCHES "Intel" )
     set( intelmkl_THREAD_LIBRARY_NAME ${intelmkl_OMP_INTEL_LIBRARY_NAME} )
   elseif( CMAKE_C_COMPILER_ID MATCHES "PGI" )
@@ -88,24 +75,13 @@ else()
 endif()
 
 
-if( NOT intelmkl_PREFIX )
-  set( intelmkl_PREFIX $ENV{MKLROOT} )
-endif()
-
+# Header
 find_path( intelmkl_INCLUDE_DIR
   NAMES mkl.h
   HINTS ${intelmkl_PREFIX}
   PATHS ${intelmkl_INCLUDE_DIR}
   PATH_SUFFIXES include
   DOC "Intel(R) MKL header"
-)
-
-find_library( intelmkl_LIBRARY
-  NAMES ${intelmkl_LIBRARY_NAME}
-  HINTS ${intelmkl_PREFIX}
-  PATHS ${intelmkl_LIBRARY_DIR} ${CMAKE_C_IMPLICIT_LINK_DIRECTORIES}
-  PATH_SUFFIXES lib/intel64 lib/ia32
-  DOC "Intel(R) MKL Library"
 )
 
 find_library( intelmkl_THREAD_LIBRARY
@@ -123,6 +99,7 @@ find_library( intelmkl_CORE_LIBRARY
   PATH_SUFFIXES lib/intel64 lib/ia32
   DOC "Intel(R) MKL CORE Library"
 )
+
 
 
 # Check version
@@ -159,6 +136,44 @@ if( intelmkl_INCLUDE_DIR )
 endif()
 
 
+# Handle LP64 / ILP64
+find_library( intelmkl_ILP64_LIBRARY
+  NAMES ${intelmkl_ILP64_LIBRARY_NAME}
+  HINTS ${intelmkl_PREFIX}
+  PATHS ${intelmkl_LIBRARY_DIR} ${CMAKE_C_IMPLICIT_LINK_DIRECTORIES}
+  PATH_SUFFIXES lib/intel64 lib/ia32
+  DOC "Intel(R) ILP64 MKL Library"
+)
+
+find_library( intelmkl_LP64_LIBRARY
+  NAMES ${intelmkl_LP64_LIBRARY_NAME}
+  HINTS ${intelmkl_PREFIX}
+  PATHS ${intelmkl_LIBRARY_DIR} ${CMAKE_C_IMPLICIT_LINK_DIRECTORIES}
+  PATH_SUFFIXES lib/intel64 lib/ia32
+  DOC "Intel(R) LP64 MKL Library"
+)
+
+if( intelmkl_ILP64_LIBRARY )
+  set( IntelMKL_ilp64_FOUND TRUE )
+endif()
+
+if( intelmkl_LP64_LIBRARY )
+  set( IntelMKL_lp64_FOUND TRUE )
+endif()
+
+# Default to LP64
+if( "ilp64" IN_LIST IntelMKL_FIND_COMPONENTS )
+  set( IntelMKL_COMPILE_DEFINITIONS "MKL_ILP64" )
+  if( CMAKE_C_COMPILER_ID MATCHES "GNU" )
+    set( IntelMKL_C_COMPILE_FLAGS        "-m64" )
+    set( IntelMKL_Fortran_COMPILE_FLAGS  "-m64" "-fdefault-integer-8" )
+  elseif( CMAKE_C_COMPILER_ID MATCHES "PGI" )
+    set( IntelMKL_Fortran_COMPILE_FLAGS "-i8" )
+  endif()
+  set( intelmkl_LIBRARY ${intelmkl_ILP64_LIBRARY} )
+else()
+  set( intelmkl_LIBRARY ${intelmkl_LP64_LIBRARY} )
+endif()
 
 if( intelmkl_LIBRARY AND intelmkl_THREAD_LIBRARY AND intelmkl_CORE_LIBRARY )
   if( intelmkl_PREFERS_STATIC )
@@ -167,7 +182,6 @@ if( intelmkl_LIBRARY AND intelmkl_THREAD_LIBRARY AND intelmkl_CORE_LIBRARY )
     set( IntelMKL_LIBRARIES "-Wl,--no-as-needed" ${intelmkl_LIBRARY} ${intelmkl_THREAD_LIBRARY} ${intelmkl_CORE_LIBRARY} )
   endif()
 
-  set( IntelMKL_LIBRARIES ${IntelMKL_LIBRARIES} "m" )
   if( intelmkl_PREFERED_THREAD_LEVEL MATCHES "openmp" )
     find_package( OpenMP QUIET )
     set( IntelMKL_LIBRARIES ${IntelMKL_LIBRARIES} OpenMP::OpenMP_C )
@@ -175,6 +189,7 @@ if( intelmkl_LIBRARY AND intelmkl_THREAD_LIBRARY AND intelmkl_CORE_LIBRARY )
     find_package( TBB QUIET )
     set( IntelMKL_LIBRARIES ${IntelMKL_LIBRARIES} tbb )
   endif() 
+  set( IntelMKL_LIBRARIES ${IntelMKL_LIBRARIES} "m" "dl" )
 endif()
 
 include(FindPackageHandleStandardArgs)

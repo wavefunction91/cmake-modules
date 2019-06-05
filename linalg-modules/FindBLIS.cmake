@@ -1,3 +1,8 @@
+# SANITY CHECK
+if( "ilp64" IN_LIST BLIS_FIND_COMPONENTS AND "lp64" IN_LIST BLIS_FIND_COMPONENTS )
+  message( FATAL_ERROR "BLIS cannot link to both ILP64 and LP64 iterfaces" )
+endif()
+
 if( blis_PREFERS_STATIC )
   set( blis_LIBRARY_NAME "libblis.a" )
 else()
@@ -59,9 +64,11 @@ endif()
 
 # Handle components
 if( BLIS_USES_ILP64 )
-  set( BLIS_ilp64_FOUND TRUE )
+  set( BLIS_ilp64_FOUND TRUE  )
+  set( BLIS_lp64_FOUND  FALSE )
 else()
-  set( BLIS_lp64_FOUND TRUE )
+  set( BLIS_ilp64_FOUND FALSE )
+  set( BLIS_lp64_FOUND  TRUE  )
 endif()
 
 

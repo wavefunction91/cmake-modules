@@ -20,6 +20,10 @@ if( referenceblas_LIBRARY )
   set( ReferenceBLAS_LIBRARIES ${referenceblas_LIBRARY} )
 endif()
 
+# Reference BLAS is always LP64
+set( ReferenceBLAS_ilp64_FOUND FALSE )
+set( ReferenceBLAS_lp64_FOUND  TRUE  )
+
 include(FindPackageHandleStandardArgs)
 find_package_handle_standard_args( ReferenceBLAS
 #  REQUIRED_VARS ReferenceBLAS_LIBRARIES ReferenceBLAS_INCLUDE_DIR
