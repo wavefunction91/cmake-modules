@@ -33,7 +33,10 @@ endif()
 if( NOT lapack_LIBRARIES )
 
   if( NOT TARGET BLAS::blas )
-    find_dependency( BLAS )
+    find_dependency( BLAS 
+      COMPONENTS          ${LAPACK_REQUIRED_COMPONENTS} 
+      OPTIONAL_COMPONENTS ${LAPACK_OPTIONAL_COMPONENTS} 
+    )
   endif()
 
   # Check if BLAS LINKS to LAPACK
