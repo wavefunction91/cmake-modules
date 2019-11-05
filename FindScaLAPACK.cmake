@@ -7,7 +7,7 @@
 #     ScaLAPACK_FOUND        - System has found ScaLAPACK installation
 #     ScaLAPACK_LIBRARIES    - ScaLAPACK libraries
 #
-#   This module will export the following targets if SUPERLU_FOUND
+#   This module will export the following targets if SCALAPACK_FOUND
 #
 #     ScaLAPACK::scalapack
 #
@@ -16,7 +16,7 @@
 #
 #   Proper usage:
 #
-#     project( TEST_FIND_SUPERLU C )
+#     project( TEST_FIND_SCALAPACK C )
 #     find_package( ScaLAPACK )
 #
 #     if( ScaLAPACK_FOUND )
@@ -33,14 +33,6 @@
 #     scalapack_PREFIX
 #     scalapack_LIBRARY_DIR
 #     scalapack_LIBRARIES
-#
-#
-#   This module also calls FindLinAlg.cmake if no LinAlg::BLAS
-#   TARGET is found. If this behaviour is not desired, ensure 
-#   that there is a proper definition of LinAlg::BLAS prior
-#   to invokation by either calling find_package( LinAlg ) 
-#   or creating a user defined target which properly links to
-#   blas
 #
 #==================================================================
 #   Copyright (c) 2018 The Regents of the University of California,
@@ -97,18 +89,18 @@ include( ${CMAKE_CURRENT_LIST_DIR}/CommonFunctions.cmake )
 
 fill_out_prefix( scalapack )
 
-
-
 # Dependencies
 include(CMakeFindDependencyMacro)
-if( NOT TARGET LinAlg::BLAS )
-  find_package( LinAlg REQUIRED )
+if( NOT TARGET LAPACK::lapack )
+  find_dependency( LAPACK OPTIONAL_COMPONENTS scalapack blacs )
 endif()
 
-# MPI
-if( NOT TARGET MPI::MPI_C )
-  find_package( MPI REQUIRED )
-endif()
+# BLACS Handles MPI
+if( NOT TARGET BLACS::BLACS )
+  copy_meta_data( scalapack blacs )
+  find_dependency( BLACS )
+endif() 
+
 
 
 
@@ -125,18 +117,39 @@ if( NOT scalapack_LIBRARIES )
 
 else()
 
-  # FIXME: Check if files exists at least?
   set( ScaLAPACK_LIBRARIES ${scalapack_LIBRARIES} )
+
+endif()
+
+# Test Linkage
+cmake_push_check_state( RESET )
+
+if( ScaLAPACK_LIBRARIES )
+  set( CMAKE_REQUIRED_LIBRARIES ${ScaLAPACK_LIBRARIES} )
+endif()
+list( APPEND CMAKE_REQUIRED_LIBRARIES BLACS::BLACS LAPACK::lapack )
+
+
+check_library_exists( "" pdgemm_ ""  SCALAPACK_HAS_PDGEMM  )
+check_library_exists( "" pzgemm_ ""  SCALAPACK_HAS_PZGEMM  )
+check_library_exists( "" pdpotrf_ "" SCALAPACK_HAS_PDPOTRF )
+check_library_exists( "" pzpotrf_ "" SCALAPACK_HAS_PZPOTRF )
+
+cmake_pop_check_state()
+
+if( SCALAPACK_HAS_PDGEMM AND SCALAPACK_HAS_PZGEMM AND SCALAPACK_HAS_PDPOTRF AND SCALAPACK_HAS_PZPOTRF )
+
+  set( ScaLAPACK_LINK_OK TRUE )
 
 endif()
 
 
 # Determine if we've found ScaLAPACK
-mark_as_advanced( ScaLAPACK_FOUND ScaLAPACK_LIBRARIES )
+mark_as_advanced( ScaLAPACK_FOUND ScaLAPACK_LIBRARIES ScaLAPACK_LINK_OK )
 
 include(FindPackageHandleStandardArgs)
 find_package_handle_standard_args( ScaLAPACK
-  REQUIRED_VARS ScaLAPACK_LIBRARIES
+  REQUIRED_VARS ScaLAPACK_LINK_OK
 )
 
 # Export target
@@ -144,7 +157,7 @@ if( ScaLAPACK_FOUND AND NOT TARGET ScaLAPACK::scalapack )
 
   add_library( ScaLAPACK::scalapack INTERFACE IMPORTED )
   set_target_properties( ScaLAPACK::scalapack PROPERTIES
-    INTERFACE_LINK_LIBRARIES      "${ScaLAPACK_LIBRARIES};MPI::MPI_C;LinAlg::BLAS" 
+    INTERFACE_LINK_LIBRARIES      "${ScaLAPACK_LIBRARIES};BLACS::BLACS;LAPACK::lapack" 
   )
 
 endif()

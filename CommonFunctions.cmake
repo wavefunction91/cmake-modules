@@ -78,3 +78,41 @@ function( copy_meta_data _src _dest )
 endfunction()
 
 
+function( get_true_target_property _out _target _property )
+
+  if( TARGET ${_target} )
+    get_property( _${_target}_imported TARGET ${_target} PROPERTY IMPORTED )
+
+    if( NOT ${_property} MATCHES "INTERFACE_LINK_LIBRARIES" )
+      get_property( _${_target}_property TARGET ${_target} PROPERTY ${_property} )
+    endif()
+
+    if( _${_target}_imported )
+
+      #message( STATUS "${_target} is IMPORTED" )
+
+      get_property( _${_target}_link TARGET ${_target} PROPERTY INTERFACE_LINK_LIBRARIES )
+      foreach( _lib ${_${_target}_link} )
+        #message( STATUS "Checking ${_lib}")
+        if( TARGET ${_lib} )
+          get_true_target_property( _${_lib}_property ${_lib} ${_property} )
+          #message( STATUS "${_lib} is a TARGET with ${_${_lib}_property}" )
+          if( _${_lib}_property )
+            list( APPEND _${_target}_property_imported ${_${_lib}_property} )
+          endif()
+        elseif( ${_property} MATCHES "INTERFACE_LINK_LIBRARIES" )
+          list( APPEND _${_target}_property_imported ${_lib} )
+        endif()
+      endforeach()
+      if(_${_target}_property_imported)
+        list(APPEND _${_target}_property ${_${_target}_property_imported} )
+      endif()
+      set( ${_out} ${_${_target}_property} PARENT_SCOPE )
+    else()
+      #message( STATUS "${_target} is NOT IMPORTED" )
+      #message( STATUS "Setting ${_out} to ${_${_target}_property} " )
+      set( ${_out} ${_${_target}_property} PARENT_SCOPE )
+    endif()
+  endif()
+
+endfunction()

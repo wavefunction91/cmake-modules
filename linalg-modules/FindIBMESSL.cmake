@@ -1,3 +1,7 @@
+if( "ilp64" IN_LIST IBMESSL_FIND_COMPONENTS AND "lp64" IN_LIST IBMESSL_FIND_COMPONENTS )
+  message( FATAL_ERROR "IBMESSL cannot link to both ILP64 and LP64 iterfaces" )
+endif()
+
 set( ibmessl_LP64_SERIAL_LIBRARY_NAME  "essl"        )
 set( ibmessl_LP64_SMP_LIBRARY_NAME     "esslsmp"     )
 set( ibmessl_ILP64_SERIAL_LIBRARY_NAME "essl6464"    )
@@ -8,18 +12,12 @@ if( NOT ibmessl_PREFERED_THREAD_LEVEL )
   set( ibmessl_PREFERED_THREAD_LEVEL "smp" )
 endif()
 
-if( ibmessl_PREFERS_ILP64 )
-  if( ibmessl_PREFERED_THREAD_LEVEL MATCHES "smp" )
-    set( ibmessl_LIBRARY_NAME ${ibmessl_ILP64_SMP_LIBRARY_NAME} )
-  else()
-    set( ibmessl_LIBRARY_NAME ${ibmessl_ILP64_SERIAL_LIBRARY_NAME} )
-  endif()
+if( ibmessl_PREFERED_THREAD_LEVEL MATCHES "smp" )
+  set( ibmessl_LP64_LIBRARY_NAME  ${ibmessl_LP64_SMP_LIBRARY_NAME}  )
+  set( ibmessl_ILP64_LIBRARY_NAME ${ibmessl_ILP64_SMP_LIBRARY_NAME} )
 else()
-  if( ibmessl_PREFERED_THREAD_LEVEL MATCHES "smp" )
-    set( ibmessl_LIBRARY_NAME ${ibmessl_LP64_SMP_LIBRARY_NAME} )
-  else()
-    set( ibmessl_LIBRARY_NAME ${ibmessl_LP64_SERIAL_LIBRARY_NAME} )
-  endif()
+  set( ibmessl_LP64_LIBRARY_NAME  ${ibmessl_LP64_SERIAL_LIBRARY_NAME}  )
+  set( ibmessl_ILP64_LIBRARY_NAME ${ibmessl_ILP64_SERIAL_LIBRARY_NAME} )
 endif()
 
 
@@ -31,13 +29,37 @@ find_path( ibmessl_INCLUDE_DIR
   DOC "IBM(R) ESSL header"
 )
 
-find_library( ibmessl_LIBRARY
-  NAMES ${ibmessl_LIBRARY_NAME}
+find_library( ibmessl_LP64_LIBRARY
+  NAMES ${ibmessl_LP64_LIBRARY_NAME}
   HINTS ${ibmessl_PREFIX}
   PATHS ${ibmessl_LIBRARY_DIR} ${CMAKE_C_IMPLICIT_LINK_DIRECTORIES} 
   PATH_SUFFIXES lib lib64 lib32
   DOC "IBM(R) ESSL Library"
 )
+
+find_library( ibmessl_ILP64_LIBRARY
+  NAMES ${ibmessl_LP64_LIBRARY_NAME}
+  HINTS ${ibmessl_PREFIX}
+  PATHS ${ibmessl_LIBRARY_DIR} ${CMAKE_C_IMPLICIT_LINK_DIRECTORIES} 
+  PATH_SUFFIXES lib lib64 lib32
+  DOC "IBM(R) ESSL Library"
+)
+
+if( ibmessl_ILP64_LIBRARY )
+  set( IBMESSL_ilp64_FOUND TRUE )
+endif()
+
+if( ibmessl_LP64_LIBRARY )
+  set( IBMESSL_lp64_FOUND TRUE )
+endif()
+
+if( "ilp64" IN_LIST IBMESSL_FIND_COMPONENTS )
+  set( ibmessl_LIBRARY ${ibmessl_ILP64_LIBRARY} )
+else()
+  set( ibmessl_LIBRARY ${ibmessl_LP64_LIBRARY} )
+endif()
+
+
 
 if( ibmessl_INCLUDE_DIR )
   set( IBMESSL_INCLUDE_DIR ${ibmessl_INCLUDE_DIR} )

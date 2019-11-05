@@ -26,6 +26,10 @@ if( "ilp64" IN_LIST IntelMKL_FIND_COMPONENTS AND "lp64" IN_LIST IntelMKL_FIND_CO
   message( FATAL_ERROR "IntelMKL cannot link to both ILP64 and LP64 iterfaces" )
 endif()
 
+if( "scalapack" IN_LIST IntelMKL_FIND_COMPONENTS AND NOT ("blacs" IN_LIST IntelMKL_FIND_COMPONENTS) )
+  list(APPEND IntelMKL_FIND_COMPONENTS "blacs" )
+endif()
+
 # MKL lib names
 if( intelmkl_PREFERS_STATIC )
   set( intelmkl_LP64_LIBRARY_NAME       "libmkl_intel_lp64.a"   )
@@ -36,6 +40,16 @@ if( intelmkl_PREFERS_STATIC )
   set( intelmkl_OMP_PGI_LIBRARY_NAME    "libmkl_pgi_thread.a"   )
   set( intelmkl_TBB_LIBRARY_NAME        "libmkl_tbb_thread.a"   )
   set( intelmkl_CORE_LIBRARY_NAME       "libmkl_core.a"         )
+
+  set( intelmkl_LP64_SCALAPACK_LIBRARY_NAME  "libmkl_scalapack_lp64.a"  )
+  set( intelmkl_ILP64_SCALAPACK_LIBRARY_NAME "libmkl_scalapack_ilp64.a" )
+
+  set( intelmkl_LP64_INTELMPI_BLACS_LIBRARY_NAME  "libmkl_blacs_intelmpi_lp64.a"  )
+  set( intelmkl_LP64_OPENMPI_BLACS_LIBRARY_NAME   "libmkl_blacs_openmpi_lp64.a"   )
+  set( intelmkl_LP64_SGIMPT_BLACS_LIBRARY_NAME    "libmkl_blacs_sgimpt_lp64.a"    )
+  set( intelmkl_ILP64_INTELMPI_BLACS_LIBRARY_NAME "libmkl_blacs_intelmpi_ilp64.a" )
+  set( intelmkl_ILP64_OPENMPI_BLACS_LIBRARY_NAME  "libmkl_blacs_openmpi_ilp64.a"  )
+  set( intelmkl_ILP64_SGIMPT_BLACS_LIBRARY_NAME   "libmkl_blacs_sgimpt_ilp64.a"   )
 else()
   set( intelmkl_LP64_LIBRARY_NAME       "mkl_intel_lp64"   )
   set( intelmkl_ILP64_LIBRARY_NAME      "mkl_intel_ilp64"  )
@@ -45,12 +59,26 @@ else()
   set( intelmkl_OMP_PGI_LIBRARY_NAME    "mkl_pgi_thread"   )
   set( intelmkl_TBB_LIBRARY_NAME        "mkl_tbb_thread"   )
   set( intelmkl_CORE_LIBRARY_NAME       "mkl_core"         )
+
+  set( intelmkl_LP64_SCALAPACK_LIBRARY_NAME  "mkl_scalapack_lp64"  )
+  set( intelmkl_ILP64_SCALAPACK_LIBRARY_NAME "mkl_scalapack_ilp64" )
+
+  set( intelmkl_LP64_INTELMPI_BLACS_LIBRARY_NAME  "mkl_blacs_intelmpi_lp64"  )
+  set( intelmkl_LP64_OPENMPI_BLACS_LIBRARY_NAME   "mkl_blacs_openmpi_lp64"   )
+  set( intelmkl_LP64_SGIMPT_BLACS_LIBRARY_NAME    "mkl_blacs_sgimpt_lp64"    )
+  set( intelmkl_ILP64_INTELMPI_BLACS_LIBRARY_NAME "mkl_blacs_intelmpi_ilp64" )
+  set( intelmkl_ILP64_OPENMPI_BLACS_LIBRARY_NAME  "mkl_blacs_openmpi_ilp64"  )
+  set( intelmkl_ILP64_SGIMPT_BLACS_LIBRARY_NAME   "mkl_blacs_sgimpt_ilp64"   )
 endif()
 
 
 # Defaults
 if( NOT intelmkl_PREFERED_THREAD_LEVEL )
   set( intelmkl_PREFERED_THREAD_LEVEL "openmp" )
+endif()
+
+if( NOT intelmkl_PREFERED_MPI_LIBRARY )
+  set( intelmkl_PREFERED_MPI_LIBRARY "intelmpi" )
 endif()
 
 if( NOT intelmkl_PREFIX )
@@ -72,6 +100,19 @@ else() # OpenMP
   else()
     set( intelmkl_THREAD_LIBRARY_NAME ${intelmkl_OMP_GNU_LIBRARY_NAME} )
   endif()
+endif()
+
+
+# MKL MPI for BLACS
+if( intelmkl_PREFERED_MPI_LIBRARY MATCHES "openmpi" )
+  set( intelmkl_LP64_BLACS_LIBRARY_NAME  ${intelmkl_LP64_OPENMPI_LIBRARY_NAME}  )
+  set( intelmkl_ILP64_BLACS_LIBRARY_NAME ${intelmkl_ILP64_OPENMPI_LIBRARY_NAME} )
+elseif( intelmkl_PREFERED_MPI_LIBRARY MATCHES "sgimpt" )
+  set( intelmkl_LP64_BLACS_LIBRARY_NAME  ${intelmkl_LP64_SGIMPT_LIBRARY_NAME}  )
+  set( intelmkl_ILP64_BLACS_LIBRARY_NAME ${intelmkl_ILP64_SGIMPT_LIBRARY_NAME} )
+else() # Intel MPI
+  set( intelmkl_LP64_BLACS_LIBRARY_NAME  ${intelmkl_LP64_INTELMPI_LIBRARY_NAME}  )
+  set( intelmkl_ILP64_BLACS_LIBRARY_NAME ${intelmkl_ILP64_INTELMPI_LIBRARY_NAME} )
 endif()
 
 
@@ -161,6 +202,49 @@ if( intelmkl_LP64_LIBRARY )
   set( IntelMKL_lp64_FOUND TRUE )
 endif()
 
+
+
+# BLACS / ScaLAPACK
+
+find_library( intelmkl_ILP64_BLACS_LIBRARY
+  NAMES ${intelmkl_ILP64_BLACS_LIBRARY_NAME}
+  HINTS ${intelmkl_PREFIX}
+  PATHS ${intelmkl_LIBRARY_DIR} ${CMAKE_C_IMPLICIT_LINK_DIRECTORIES}
+  PATH_SUFFIXES lib/intel64 lib/ia32
+  DOC "Intel(R) ILP64 MKL BLACS Library"
+)
+
+find_library( intelmkl_LP64_BLACS_LIBRARY
+  NAMES ${intelmkl_LP64_BLACS_LIBRARY_NAME}
+  HINTS ${intelmkl_PREFIX}
+  PATHS ${intelmkl_LIBRARY_DIR} ${CMAKE_C_IMPLICIT_LINK_DIRECTORIES}
+  PATH_SUFFIXES lib/intel64 lib/ia32
+  DOC "Intel(R) LP64 MKL BLACS Library"
+)
+
+find_library( intelmkl_ILP64_SCALAPACK_LIBRARY
+  NAMES ${intelmkl_ILP64_SCALAPACK_LIBRARY_NAME}
+  HINTS ${intelmkl_PREFIX}
+  PATHS ${intelmkl_LIBRARY_DIR} ${CMAKE_C_IMPLICIT_LINK_DIRECTORIES}
+  PATH_SUFFIXES lib/intel64 lib/ia32
+  DOC "Intel(R) ILP64 MKL SCALAPACK Library"
+)
+
+find_library( intelmkl_LP64_SCALAPACK_LIBRARY
+  NAMES ${intelmkl_LP64_SCALAPACK_LIBRARY_NAME}
+  HINTS ${intelmkl_PREFIX}
+  PATHS ${intelmkl_LIBRARY_DIR} ${CMAKE_C_IMPLICIT_LINK_DIRECTORIES}
+  PATH_SUFFIXES lib/intel64 lib/ia32
+  DOC "Intel(R) LP64 MKL SCALAPACK Library"
+)
+
+
+
+
+
+
+
+
 # Default to LP64
 if( "ilp64" IN_LIST IntelMKL_FIND_COMPONENTS )
   set( IntelMKL_COMPILE_DEFINITIONS "MKL_ILP64" )
@@ -171,16 +255,68 @@ if( "ilp64" IN_LIST IntelMKL_FIND_COMPONENTS )
     set( IntelMKL_Fortran_COMPILE_FLAGS "-i8" )
   endif()
   set( intelmkl_LIBRARY ${intelmkl_ILP64_LIBRARY} )
+
+  if( intelmkl_ILP64_BLACS_LIBRARY )
+    set( intelmkl_BLACS_LIBRARY ${intelmkl_ILP64_BLACS_LIBRARY} )
+    set( IntelMKL_blacs_FOUND TRUE )
+  endif()
+
+  if( intelmkl_ILP64_SCALAPACK_LIBRARY )
+    set( intelmkl_SCALAPACK_LIBRARY ${intelmkl_ILP64_SCALAPACK_LIBRARY} )
+    set( IntelMKL_scalapack_FOUND TRUE )
+  endif()
+
 else()
   set( intelmkl_LIBRARY ${intelmkl_LP64_LIBRARY} )
+
+  if( intelmkl_LP64_BLACS_LIBRARY )
+    set( intelmkl_BLACS_LIBRARY ${intelmkl_LP64_BLACS_LIBRARY} )
+    set( IntelMKL_blacs_FOUND TRUE )
+  endif()
+
+  if( intelmkl_LP64_SCALAPACK_LIBRARY )
+    set( intelmkl_SCALAPACK_LIBRARY ${intelmkl_LP64_SCALAPACK_LIBRARY} )
+    set( IntelMKL_scalapack_FOUND TRUE )
+  endif()
 endif()
 
 if( intelmkl_LIBRARY AND intelmkl_THREAD_LIBRARY AND intelmkl_CORE_LIBRARY )
-  if( intelmkl_PREFERS_STATIC )
-    set( IntelMKL_LIBRARIES "-Wl,--start-group" ${intelmkl_LIBRARY} ${intelmkl_THREAD_LIBRARY} ${intelmkl_CORE_LIBRARY} "-Wl,--end-group" )
+  #if( intelmkl_PREFERS_STATIC )
+  #  set( IntelMKL_LIBRARIES "-Wl,--start-group" ${intelmkl_LIBRARY} ${intelmkl_THREAD_LIBRARY} ${intelmkl_CORE_LIBRARY} "-Wl,--end-group" )
+  #else()
+  #  set( IntelMKL_LIBRARIES "-Wl,--no-as-needed" ${intelmkl_LIBRARY} ${intelmkl_THREAD_LIBRARY} ${intelmkl_CORE_LIBRARY} )
+  #endif()
+
+
+  if( intel_PREFERS_STATIC )
+
+    if( "scalapack" IN_LIST IntelMKL_FIND_COMPONENTS )
+      set( IntelMKL_LIBRARIES ${intelmkl_SCALAPACK_LIBRARY} )
+    endif()
+
+    list( APPEND IntelMKL_LIBRARIES  "-Wl,--start-group" ${intelmkl_LIBRARY} ${intelmkl_THREAD_LIBRARY} ${intelmkl_CORE_LIBRARY} )
+
+    if( "blacs" IN_LIST IntelMKL_FIND_COMPONENTS )
+      list( APPEND IntelMKL_LIBRARIES ${intelmkl_BLACS_LIBRARY} )
+    endif()
+
+    list( APPEND IntelMKL_LIBRARIES "-Wl,--end-group" )
+
   else()
-    set( IntelMKL_LIBRARIES "-Wl,--no-as-needed" ${intelmkl_LIBRARY} ${intelmkl_THREAD_LIBRARY} ${intelmkl_CORE_LIBRARY} )
+
+    set( IntelMKL_LIBRARIES "-Wl,--no-as-needed" )
+    if( "scalapack" IN_LIST IntelMKL_FIND_COMPONENTS )
+      list( APPEND IntelMKL_LIBRARIES ${intelmkl_SCALAPACK_LIBRARY} )
+    endif()
+
+    list( APPEND IntelMKL_LIBRARIES  ${intelmkl_LIBRARY} ${intelmkl_THREAD_LIBRARY} ${intelmkl_CORE_LIBRARY} )
+
+    if( "blacs" IN_LIST IntelMKL_FIND_COMPONENTS )
+      list( APPEND IntelMKL_LIBRARIES ${intelmkl_BLACS_LIBRARY} )
+    endif()
+
   endif()
+
 
   if( intelmkl_PREFERED_THREAD_LEVEL MATCHES "openmp" )
     find_package( OpenMP QUIET )
@@ -208,5 +344,13 @@ if( IntelMKL_FOUND AND NOT TARGET IntelMKL::mkl )
     INTERFACE_COMPILE_OPTIONS     "${IntelMKL_C_COMPILE_FLAGS}"
     INTERFACE_COMPILE_DEFINITIONS "${IntelMKL_COMPILE_DEFINITIONS}"
   )
+
+  if( "scalapack" IN_LIST IntelMKL_FIND_COMPONENTS AND NOT scalapack_LIBRARIES )
+    set( scalapack_LIBRARIES IntelMKL::mkl )
+  endif()
+
+  if( "blacs" IN_LIST IntelMKL_FIND_COMPONENTS AND NOT blacs_LIBRARIES )
+    set( blacs_LIBRARIES IntelMKL::mkl )
+  endif()
 
 endif()

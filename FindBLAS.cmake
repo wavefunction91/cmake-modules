@@ -35,10 +35,12 @@ if( NOT blas_LIBRARIES )
   foreach( blas_type ${BLAS_PREFERENCE_LIST} )
 
     string( TOLOWER ${blas_type} blas_lower_case )
-    set( ${blas_lower_case}_PREFIX         ${blas_PREFIX}         )
-    set( ${blas_lower_case}_INCLUDE_DIR    ${blas_INCLUDE_DIR}    )
-    set( ${blas_lower_case}_LIBRARY_DIR    ${blas_LIBRARY_DIR}    )
-    set( ${blas_lower_case}_PREFERS_STATIC ${blas_PREFERS_STATIC} )
+    #set( ${blas_lower_case}_PREFIX         ${blas_PREFIX}         )
+    #set( ${blas_lower_case}_INCLUDE_DIR    ${blas_INCLUDE_DIR}    )
+    #set( ${blas_lower_case}_LIBRARY_DIR    ${blas_LIBRARY_DIR}    )
+    #set( ${blas_lower_case}_PREFERS_STATIC ${blas_PREFERS_STATIC} )
+    copy_meta_data( blas ${blas_lower_case} )
+
 
     find_package( ${blas_type} 
       COMPONENTS          ${BLAS_REQUIRED_COMPONENTS} 
