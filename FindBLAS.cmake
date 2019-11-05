@@ -70,6 +70,15 @@ if( NOT blas_LIBRARIES )
         set( BLAS_lp64_FOUND ${${blas_type}_lp64_FOUND} )
       endif()
 
+      # Propagate BLACS / ScaLAPACK
+      if( "blacs" IN_LIST BLAS_FIND_COMPONENTS )
+        set( BLAS_blacs_FOUND ${${blas_type}_blacs_FOUND} )
+      endif()
+      if( "scalapack" IN_LIST BLAS_FIND_COMPONENTS )
+        set( BLAS_scalapack_FOUND ${${blas_type}_scalapack_FOUND} )
+      endif()
+
+
       break()
 
     endif()
